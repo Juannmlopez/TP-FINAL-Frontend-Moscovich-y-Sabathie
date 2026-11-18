@@ -1,0 +1,7 @@
+/* Estilos de la página Configuración */
+/* TODO: estilos según el Figma */
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}

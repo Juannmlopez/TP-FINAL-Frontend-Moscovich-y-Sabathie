@@ -1,0 +1,486 @@
+/* Reset, estilos base, layout y componentes de ui. Mobile primero. */
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Texto solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Encabezado de página ---------- */
+.page__title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-5);
+}
+
+/* ---------- Layout ---------- */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.layout__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout__content {
+  flex: 1;
+  padding: var(--space-4);
+}
+
+/* Sidebar: en mobile es un panel que entra desde la izquierda */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  width: var(--sidebar-width);
+  padding: var(--space-5) var(--space-4);
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  transform: translateX(-100%);
+  transition: transform var(--transition);
+}
+
+.sidebar--open {
+  transform: translateX(0);
+}
+
+.sidebar__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background-color: var(--color-overlay);
+}
+
+.sidebar__brand {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-6);
+}
+
+.sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sidebar__link {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+}
+
+.sidebar__link:hover {
+  color: var(--color-text);
+  background-color: var(--color-surface-2);
+  text-decoration: none;
+}
+
+.sidebar__link--active {
+  color: var(--color-text);
+  background-color: var(--color-surface-2);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Navbar */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  height: var(--navbar-height);
+  padding: 0 var(--space-4);
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navbar__menu {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-lg);
+  background: none;
+  border: none;
+}
+
+.navbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
+.navbar__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+}
+
+.navbar__name {
+  display: none;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.avatar--initial {
+  display: grid;
+  place-items: center;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
+}
+
+/* ---------- Botones ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-weight: var(--font-weight-bold);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition), opacity var(--transition);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn--primary {
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.btn--secondary {
+  background-color: var(--color-surface-2);
+  border-color: var(--color-border);
+}
+
+.btn--ghost {
+  background: none;
+  border-color: var(--color-border);
+}
+
+.btn--danger {
+  color: var(--color-text);
+  background-color: var(--color-danger);
+}
+
+.btn--full {
+  width: 100%;
+}
+
+/* ---------- Campos de formulario ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.field__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.field__input {
+  padding: var(--space-3);
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.field__input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.field__input--error {
+  border-color: var(--color-danger);
+}
+
+.field__error {
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+}
+
+/* ---------- Spinner ---------- */
+.spinner__wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.spinner {
+  display: inline-block;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner--sm {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.spinner--md {
+  width: 28px;
+  height: 28px;
+}
+
+.spinner--lg {
+  width: 48px;
+  height: 48px;
+}
+
+.spinner__label {
+  color: var(--color-text-muted);
+}
+
+.spinner__fullscreen {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Estado vacío y errores ---------- */
+.empty-state {
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.empty-state__title {
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+}
+
+.empty-state__action {
+  margin-top: var(--space-4);
+}
+
+.error-message {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+}
+
+.error-message__retry {
+  padding: var(--space-1) var(--space-3);
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-full);
+}
+
+/* ---------- Modal ---------- */
+.modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background-color: var(--color-overlay);
+}
+
+.modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.modal__header,
+.modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.modal__footer {
+  justify-content: flex-end;
+}
+
+.modal__title {
+  font-size: var(--font-size-lg);
+}
+
+.modal__close {
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  background: none;
+  border: none;
+}
+
+.modal__body {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+/* ---------- Pantallas grandes ---------- */
+@media (min-width: 768px) {
+  .layout__content {
+    padding: var(--space-6);
+  }
+
+  /* El sidebar queda fijo a la izquierda y no hace falta el botón de menú */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-shrink: 0;
+    transform: none;
+  }
+
+  .sidebar__backdrop,
+  .navbar__menu {
+    display: none;
+  }
+
+  .navbar__name {
+    display: inline;
+  }
+}
+
+/* ---------- Pantallas de autenticación (login y registro) ---------- */
+.auth {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--space-4);
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-6) var(--space-5);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.auth__brand {
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.auth__title {
+  margin-bottom: var(--space-5);
+  font-size: var(--font-size-xl);
+}
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.auth__footer {
+  margin-top: var(--space-5);
+  text-align: center;
+  color: var(--color-text-muted);
+}

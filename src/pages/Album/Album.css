@@ -1,0 +1,11 @@
+/* Estilos de la página Álbum */
+/* TODO: estilos según el Figma */
+.album {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.album__id {
+  color: var(--color-text-muted);
+}

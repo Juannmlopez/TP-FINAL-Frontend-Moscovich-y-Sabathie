@@ -1,0 +1,7 @@
+/* Estilos de la página Mis playlists */
+/* TODO: estilos según el Figma */
+.collections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}

@@ -1,0 +1,11 @@
+/* Estilos de la página Canción */
+/* TODO: estilos según el Figma */
+.track {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.track__id {
+  color: var(--color-text-muted);
+}

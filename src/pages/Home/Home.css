@@ -1,0 +1,7 @@
+/* Estilos de la página Inicio */
+/* TODO: estilos según el Figma */
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}

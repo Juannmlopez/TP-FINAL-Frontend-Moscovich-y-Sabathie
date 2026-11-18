@@ -1,0 +1,7 @@
+/* Estilos de la página Buscar */
+/* TODO: estilos según el Figma */
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}

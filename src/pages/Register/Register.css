@@ -1,0 +1,4 @@
+/* Estilos propios de la pantalla de registro (los comunes están en .auth de global.css) */
+.register .error-message {
+  margin-bottom: var(--space-4);
+}

@@ -1,0 +1,7 @@
+/* Estilos de la página Mi biblioteca */
+/* TODO: estilos según el Figma */
+.library {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
