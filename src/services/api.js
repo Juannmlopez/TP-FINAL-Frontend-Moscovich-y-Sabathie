@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // Rutas donde un 401 es una respuesta esperable y no significa "sesión vencida"
-const RUTAS_SIN_AVISO = ['/auth/me', '/auth/login'];
+const RUTAS_SIN_AVISO = ['/auth/me', '/auth/login', '/auth/logout'];
 
 api.interceptors.response.use(
   (response) => response,

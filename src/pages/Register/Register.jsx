@@ -1,130 +1,151 @@
-// Registro de usuario nuevo. Al terminar, el backend ya deja la sesión iniciada
+// Registro en 3 pasos (pantallas "Registro mail", "Registro contraseña" y "Registro cuenta" del Figma).
+// Cada paso valida su campo antes de avanzar. Al terminar, el backend ya deja la sesión iniciada.
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import AuthHeader from '../../components/layout/AuthHeader';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import ErrorMessage from '../../components/ui/ErrorMessage';
+import { erroresDelServidor, validarEmail, validarPassword, validarUsername } from '../../utils/validators';
 import './Register.css';
 
-// Mismas reglas que el backend (validators/auth.validator.js)
-const USERNAME_REGEX = /^[A-Za-z0-9_.]{3,30}$/;
-const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+// Un paso por campo, en el orden del Figma
+const PASOS = [
+  {
+    campo: 'email',
+    label: '¿Cuál es tu email?',
+    hint: 'Lo vas a usar para iniciar sesión.',
+    type: 'email',
+    autoComplete: 'email',
+    validar: validarEmail,
+  },
+  {
+    campo: 'password',
+    label: 'Creá una contraseña',
+    hint: 'Usá al menos 8 caracteres.',
+    type: 'password',
+    autoComplete: 'new-password',
+    validar: validarPassword,
+  },
+  {
+    campo: 'username',
+    label: 'Elegí tu nombre de usuario',
+    hint: 'Así vas a aparecer en tu perfil. Letras, números, "_" o ".".',
+    type: 'text',
+    autoComplete: 'username',
+    validar: validarUsername,
+  },
+];
 
-// Devuelve un objeto { campo: mensaje } con los errores encontrados
-function validar({ username, email, password, confirmPassword }) {
-  const errores = {};
-  if (!USERNAME_REGEX.test(username)) {
-    errores.username = 'Entre 3 y 30 caracteres: letras, números, "_" o "."';
-  }
-  if (!EMAIL_REGEX.test(email.trim())) {
-    errores.email = 'Ingresá un email válido';
-  }
-  if (password.length < 8) {
-    errores.password = 'La contraseña debe tener al menos 8 caracteres';
-  } else if (password.length > 72) {
-    errores.password = 'La contraseña puede tener como máximo 72 caracteres';
-  }
-  if (confirmPassword !== password) {
-    errores.confirmPassword = 'Las contraseñas no coinciden';
-  }
-  return errores;
-}
+const ULTIMO_PASO = PASOS.length - 1;
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [form, setForm] = useState({ username: '', email: '', password: '', confirmPassword: '' });
+  const [paso, setPaso] = useState(0);
+  const [form, setForm] = useState({ email: '', password: '', username: '' });
   const [errores, setErrores] = useState({});
   const [errorServidor, setErrorServidor] = useState('');
   const [enviando, setEnviando] = useState(false);
 
   const destino = location.state?.from?.pathname || '/';
+  const actual = PASOS[paso];
+  const valor = form[actual.campo];
+  const valido = !actual.validar(valor);
 
   function handleChange(event) {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setErrores((prev) => ({ ...prev, [name]: undefined }));
+    setErrorServidor('');
+  }
+
+  function handleBack() {
+    setErrorServidor('');
+    if (paso === 0) navigate('/welcome');
+    else setPaso(paso - 1);
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setErrorServidor('');
 
-    const nuevosErrores = validar(form);
-    setErrores(nuevosErrores);
-    if (Object.keys(nuevosErrores).length > 0) return;
+    const error = actual.validar(valor);
+    if (error) {
+      setErrores((prev) => ({ ...prev, [actual.campo]: error }));
+      return;
+    }
+
+    if (paso < ULTIMO_PASO) {
+      setPaso(paso + 1);
+      return;
+    }
 
     setEnviando(true);
     try {
-      // confirmPassword solo se valida acá, no se manda al backend
       await register({
         username: form.username.trim(),
-        email: form.email.trim(),
+        email: form.email.trim().toLowerCase(),
         password: form.password,
       });
       navigate(destino, { replace: true });
-    } catch (error) {
-      setErrorServidor(error.message);
+    } catch (err) {
+      // 400 (datos inválidos) o 409 (email o usuario ya usado): el back indica el campo en details.
+      // Volvemos al primer paso que tenga error para que se pueda corregir.
+      const erroresCampo = erroresDelServidor(err.details);
+      const pasoConError = PASOS.findIndex((p) => erroresCampo[p.campo]);
+      if (pasoConError !== -1) {
+        setErrores(erroresCampo);
+        setPaso(pasoConError);
+      } else {
+        setErrorServidor(err.message);
+      }
       setEnviando(false);
     }
   }
 
   return (
     <div className="auth register">
-      <div className="auth__card">
-        <p className="auth__brand">My Collection</p>
-        <h1 className="auth__title">Crear cuenta</h1>
+      <AuthHeader title="Crear cuenta" onBack={handleBack} />
 
-        <ErrorMessage message={errorServidor} />
+      <p className="register__progress">
+        Paso {paso + 1} de {PASOS.length}
+      </p>
 
-        <form className="auth__form" onSubmit={handleSubmit} noValidate>
-          <Input
-            label="Nombre de usuario"
-            name="username"
-            autoComplete="username"
-            value={form.username}
-            onChange={handleChange}
-            error={errores.username}
-          />
-          <Input
-            label="Email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            value={form.email}
-            onChange={handleChange}
-            error={errores.email}
-          />
-          <Input
-            label="Contraseña"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            value={form.password}
-            onChange={handleChange}
-            error={errores.password}
-          />
-          <Input
-            label="Repetir contraseña"
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            value={form.confirmPassword}
-            onChange={handleChange}
-            error={errores.confirmPassword}
-          />
-          <Button type="submit" fullWidth loading={enviando}>
-            Registrarme
+      <form className="auth__form" onSubmit={handleSubmit} noValidate>
+        <Input
+          key={actual.campo} // input nuevo en cada paso (autoFocus y autocompletado correctos)
+          className="field--step"
+          label={actual.label}
+          name={actual.campo}
+          type={actual.type}
+          autoComplete={actual.autoComplete}
+          autoFocus
+          value={valor}
+          onChange={handleChange}
+          error={errores[actual.campo]}
+          hint={actual.hint}
+          adornment={paso === ULTIMO_PASO && valido ? '✓' : null}
+        />
+
+        {paso < ULTIMO_PASO ? (
+          <Button type="submit" variant="light" className="auth__next" disabled={!valido}>
+            Siguiente
           </Button>
-        </form>
-
-        <p className="auth__footer">
-          ¿Ya tenés cuenta? <Link to="/login">Iniciá sesión</Link>
-        </p>
-      </div>
+        ) : (
+          <>
+            <p className="auth__legal">
+              Al tocar "Crear cuenta", aceptás los Términos de uso y la Política de privacidad de My Collection.
+            </p>
+            <ErrorMessage message={errorServidor} />
+            <Button type="submit" variant="light" className="auth__submit btn--lg" loading={enviando}>
+              Crear cuenta
+            </Button>
+          </>
+        )}
+      </form>
     </div>
   );
 }

@@ -10,6 +10,11 @@ export default function ProtectedRoute() {
   // Todavía estamos preguntando al backend si hay sesión
   if (loading) return <Spinner fullScreen label="Cargando sesión..." />;
 
+  // Sin sesión entrando a la raíz (y sin aviso pendiente): mostramos la landing pública
+  if (!user && location.pathname === '/' && !authMessage) {
+    return <Navigate to="/welcome" replace />;
+  }
+
   // Sin sesión: al login, recordando la ruta de origen y el aviso (ej. "sesión vencida")
   if (!user) {
     return <Navigate to="/login" replace state={{ from: location, message: authMessage }} />;

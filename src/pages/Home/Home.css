@@ -1,7 +1,124 @@
-/* Estilos de la página Inicio */
-/* TODO: estilos según el Figma */
+/* Pantalla Home (Figma): filas con scroll horizontal */
 .home {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-6);
+}
+
+.home__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.home__heading {
+  font-size: var(--font-size-lg);
+}
+
+.home__heading--flush {
+  line-height: 1.2;
+}
+
+/* Fila horizontal: se desliza con el dedo en mobile */
+.home__row {
+  display: flex;
+  gap: var(--space-4);
+  margin: 0 calc(var(--space-4) * -1);
+  padding: 0 var(--space-4) var(--space-2);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.home__row > * {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* "Escuchado recientemente": ítems chicos */
+.home__recent {
+  width: 105px;
+}
+
+.home__recent-title {
+  margin-top: var(--space-2);
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* "Tu año en resumen" */
+.home__wrapped-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.home__wrapped-badge {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
+  background: linear-gradient(135deg, #cdf564, #f0a1c4);
+  border-radius: var(--radius-sm);
+}
+
+.home__eyebrow {
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.home__wrapped-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 150px;
+  color: var(--color-text);
+}
+
+.home__wrapped-card:hover {
+  text-decoration: none;
+}
+
+.home__wrapped-art {
+  display: flex;
+  align-items: flex-end;
+  aspect-ratio: 1;
+  padding: var(--space-3);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  border-radius: var(--radius-sm);
+}
+
+.home__wrapped-art strong {
+  font-size: var(--font-size-xl);
+}
+
+.home__wrapped-card--songs .home__wrapped-art {
+  color: #2d2154;
+  background: linear-gradient(160deg, #cdf564 55%, #f0a1c4);
+}
+
+.home__wrapped-card--artists .home__wrapped-art {
+  color: #3a2bd9;
+  background: linear-gradient(160deg, #c7b6f5 55%, #6bd6ff);
+}
+
+.home__wrapped-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+@media (min-width: 768px) {
+  .home__row {
+    margin: 0;
+    padding: 0 0 var(--space-2);
+  }
 }

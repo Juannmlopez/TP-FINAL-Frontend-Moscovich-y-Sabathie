@@ -1,7 +1,169 @@
-/* Estilos de la página Buscar */
-/* TODO: estilos según el Figma */
+/* Pantalla Búsqueda (Figma) */
 .search {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
+}
+
+/* Barra: campo con lupa + "Cancelar" */
+.search__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.search__field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding: 0 var(--space-3);
+  background-color: var(--color-surface-2);
+  border-radius: var(--radius-md);
+}
+
+.search__field:focus-within {
+  outline: 2px solid var(--color-text);
+}
+
+.search__icon {
+  font-size: var(--font-size-lg);
+  line-height: 1;
+}
+
+.search__input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.search__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.search__cancel,
+.search__clear,
+.search__remove {
+  background: none;
+  border: none;
+}
+
+.search__cancel {
+  font-size: var(--font-size-sm);
+}
+
+/* Filtro Canciones / Álbumes */
+.search__filters {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.search__chip {
+  padding: var(--space-1) var(--space-4);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+.search__chip--active {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Búsquedas recientes */
+.search__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.search__heading {
+  font-size: var(--font-size-md);
+}
+
+.search__clear {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Lista de resultados */
+.search__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.search__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.search__link {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  color: var(--color-text);
+}
+
+.search__link:hover {
+  text-decoration: none;
+}
+
+.search__link:hover .search__title {
+  text-decoration: underline;
+}
+
+.search__cover {
+  flex-shrink: 0;
+  width: 48px;
+}
+
+.search__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.search__title,
+.search__subtitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search__subtitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.search__explicit {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  font-size: 0.625rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-bg);
+  background-color: var(--color-text-muted);
+  border-radius: 2px;
+}
+
+.search__remove {
+  padding: var(--space-2);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  color: var(--color-text-muted);
 }

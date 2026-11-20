@@ -1,4 +1,9 @@
-/* Estilos propios de la pantalla de registro (los comunes están en .auth de global.css) */
-.register .error-message {
-  margin-bottom: var(--space-4);
+/* Estilos propios del registro (los comunes están en .auth de global.css) */
+.register__progress {
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }

@@ -1,13 +1,4 @@
-/* Estilos propios de la pantalla de login (los comunes están en .auth de global.css) */
-.login__notice {
-  margin-bottom: var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface-2);
-  color: var(--color-text-muted);
-}
-
-.login .error-message {
-  margin-bottom: var(--space-4);
+/* Estilos propios del login (los comunes están en .auth de global.css) */
+.login .auth__form {
+  flex: none;
 }

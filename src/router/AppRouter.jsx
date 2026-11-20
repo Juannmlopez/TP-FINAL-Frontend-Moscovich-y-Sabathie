@@ -1,8 +1,9 @@
-// Todas las rutas de la app: públicas (login/registro) y privadas (con layout)
+// Todas las rutas de la app: públicas (inicio, login, registro) y privadas (con layout)
 import { Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
 import MainLayout from '../components/layout/MainLayout';
+import Welcome from '../pages/Welcome/Welcome';
 import Login from '../pages/Login/Login';
 import Register from '../pages/Register/Register';
 import Home from '../pages/Home/Home';
@@ -23,6 +24,7 @@ export default function AppRouter() {
     <Routes>
       {/* Públicas: si ya hay sesión, mandan a / */}
       <Route element={<PublicRoute />}>
+        <Route path="/welcome" element={<Welcome />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Route>

@@ -1,7 +1,9 @@
-// Inicio de sesión con usuario o email + contraseña
+// Inicio de sesión con usuario o email + contraseña.
+// No tiene pantalla propia en el Figma: usa el mismo estilo que las pantallas de registro.
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import AuthHeader from '../../components/layout/AuthHeader';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import ErrorMessage from '../../components/ui/ErrorMessage';
@@ -27,8 +29,9 @@ export default function Login() {
 
   // Ruta a la que quería entrar antes de que lo mandaran al login
   const destino = location.state?.from?.pathname || '/';
-  // Mensaje que manda AuthContext cuando la sesión vence
+  // Aviso que llega por state: sesión vencida o sesión cerrada
   const aviso = location.state?.message;
+  const avisoExito = location.state?.noticeType === 'success';
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -47,7 +50,7 @@ export default function Login() {
     // El backend acepta { username } o { email }: lo decidimos por el "@"
     const identifier = form.identifier.trim();
     const credenciales = identifier.includes('@')
-      ? { email: identifier, password: form.password }
+      ? { email: identifier.toLowerCase(), password: form.password }
       : { username: identifier, password: form.password };
 
     setEnviando(true);
@@ -62,40 +65,44 @@ export default function Login() {
 
   return (
     <div className="auth login">
-      <div className="auth__card">
-        <p className="auth__brand">My Collection</p>
-        <h1 className="auth__title">Iniciar sesión</h1>
+      <AuthHeader title="Iniciar sesión" onBack={() => navigate('/welcome')} />
 
-        {aviso && !errorServidor && <p className="login__notice">{aviso}</p>}
+      <form className="auth__form" onSubmit={handleSubmit} noValidate>
+        {aviso && !errorServidor && (
+          <p className={`auth__notice ${avisoExito ? 'auth__notice--success' : ''}`} role="status">
+            {aviso}
+          </p>
+        )}
         <ErrorMessage message={errorServidor} />
 
-        <form className="auth__form" onSubmit={handleSubmit} noValidate>
-          <Input
-            label="Usuario o email"
-            name="identifier"
-            autoComplete="username"
-            value={form.identifier}
-            onChange={handleChange}
-            error={errores.identifier}
-          />
-          <Input
-            label="Contraseña"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            value={form.password}
-            onChange={handleChange}
-            error={errores.password}
-          />
-          <Button type="submit" fullWidth loading={enviando}>
-            Ingresar
-          </Button>
-        </form>
+        <Input
+          className="field--step"
+          label="Email o nombre de usuario"
+          name="identifier"
+          autoComplete="username"
+          autoFocus
+          value={form.identifier}
+          onChange={handleChange}
+          error={errores.identifier}
+        />
+        <Input
+          className="field--step"
+          label="Contraseña"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          value={form.password}
+          onChange={handleChange}
+          error={errores.password}
+        />
+        <Button type="submit" variant="light" className="auth__next btn--lg" loading={enviando}>
+          Iniciar sesión
+        </Button>
+      </form>
 
-        <p className="auth__footer">
-          ¿No tenés cuenta? <Link to="/register">Registrate</Link>
-        </p>
-      </div>
+      <p className="auth__footer">
+        ¿No tenés cuenta? <Link to="/register">Registrate</Link>
+      </p>
     </div>
   );
 }

@@ -1,16 +1,18 @@
-// Tarjeta de artista: imagen redonda y nombre. Lleva a /artist/:id.
+// Tarjeta de artista: foto redonda y nombre. Lleva a /artist/:externalId (id de Deezer).
 // Se usa en Search, Library y Home.
-// Props: artist ({ id, title, coverUrl }), actions
+// Props: artist (Content del backend: { externalId, title, coverUrl }), actions
 import { Link } from 'react-router-dom';
+import Cover from './Cover';
 
 export default function ArtistCard({ artist, actions }) {
   if (!artist) return null;
 
   return (
     <article className="card card--artist">
-      {/* TODO: imagen del artista (artist.coverUrl) en formato circular */}
-      <Link to={`/artist/${artist.id}`}>{artist.title}</Link>
-      {/* TODO: géneros principales */}
+      <Link to={`/artist/${artist.externalId}`} className="card__link">
+        <Cover src={artist.coverUrl} alt={`Foto de ${artist.title}`} round />
+        <h3 className="card__title card__title--center">{artist.title}</h3>
+      </Link>
       {actions}
     </article>
   );

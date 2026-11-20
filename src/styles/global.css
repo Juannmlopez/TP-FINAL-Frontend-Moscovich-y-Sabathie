@@ -254,6 +254,22 @@ ul {
   width: 100%;
 }
 
+/* Pastilla blanca de las pantallas de auth ("Siguiente", "Crear cuenta") */
+.btn--light {
+  color: var(--color-black);
+  background-color: var(--color-text);
+}
+
+.btn--light:disabled {
+  color: var(--color-text-muted);
+  background-color: var(--color-disabled);
+  opacity: 1;
+}
+
+.btn--lg {
+  padding: var(--space-3) var(--space-5);
+}
+
 /* ---------- Campos de formulario ---------- */
 .field {
   display: flex;
@@ -278,6 +294,27 @@ ul {
   outline: none;
 }
 
+/* Contenedor del input cuando lleva un ícono adentro (ej. tilde de válido) */
+.field__control {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.field__control .field__input {
+  padding-right: var(--space-8);
+}
+
+.field__adornment {
+  position: absolute;
+  top: 50%;
+  right: var(--space-4);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
 .field__input--error {
   border-color: var(--color-danger);
 }
@@ -285,6 +322,11 @@ ul {
 .field__error {
   font-size: var(--font-size-sm);
   color: var(--color-danger);
+}
+
+.field__hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
 }
 
 /* ---------- Spinner ---------- */
@@ -332,6 +374,70 @@ ul {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ---------- Tarjetas de contenido (álbum, canción) ---------- */
+.card {
+  width: 140px;
+}
+
+.card--lg {
+  width: 170px;
+}
+
+.card__link {
+  display: block;
+  color: var(--color-text);
+}
+
+.card__link:hover {
+  text-decoration: none;
+}
+
+.card__link:hover .cover {
+  opacity: 0.85;
+}
+
+.card__title {
+  margin-top: var(--space-2);
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card__title--center {
+  text-align: center;
+}
+
+.card__subtitle {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Portada: cuadrada por defecto, redonda para artistas */
+.cover {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background-color: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition);
+}
+
+.cover--round {
+  border-radius: var(--radius-full);
+}
+
+.cover--empty {
+  display: grid;
+  place-items: center;
+  font-size: var(--font-size-xl);
+  color: var(--color-text-muted);
 }
 
 /* ---------- Estado vacío y errores ---------- */
@@ -443,44 +549,120 @@ ul {
   }
 }
 
-/* ---------- Pantallas de autenticación (login y registro) ---------- */
+/* ---------- Pantallas de autenticación (login y registro, estilo del Figma) ---------- */
 .auth {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-5) var(--space-6);
+}
+
+/* Encabezado: botón volver + título centrado */
+.auth__header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  margin-bottom: var(--space-6);
+}
+
+.auth__back {
   display: grid;
   place-items: center;
-  min-height: 100vh;
-  padding: var(--space-4);
-}
-
-.auth__card {
-  width: 100%;
-  max-width: 420px;
-  padding: var(--space-6) var(--space-5);
-  background-color: var(--color-surface);
-  border-radius: var(--radius-lg);
-}
-
-.auth__brand {
-  margin-bottom: var(--space-1);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-primary);
+  width: 36px;
+  height: 36px;
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  background-color: var(--color-black);
+  border: none;
+  border-radius: var(--radius-full);
 }
 
 .auth__title {
-  margin-bottom: var(--space-5);
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-md);
+  text-align: center;
 }
 
 .auth__form {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
+}
+
+.auth__form .error-message {
+  font-size: var(--font-size-sm);
+}
+
+/* Botón de avanzar centrado debajo del campo */
+.auth__next {
+  align-self: center;
+  min-width: 96px;
+}
+
+/* Acción principal al pie de la pantalla (ej. "Crear cuenta") */
+.auth__submit {
+  align-self: center;
+  margin-top: auto;
 }
 
 .auth__footer {
   margin-top: var(--space-5);
+  font-size: var(--font-size-sm);
   text-align: center;
   color: var(--color-text-muted);
+}
+
+.auth__legal {
+  padding-top: var(--space-5);
+  font-size: var(--font-size-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Avisos informativos (sesión vencida, sesión cerrada) */
+.auth__notice {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.auth__notice--success {
+  color: var(--color-text);
+  background-color: var(--color-success-bg);
+  border-color: var(--color-primary);
+}
+
+/* Campo grande de las pantallas de auth: el label hace de título */
+.field--step .field__label {
+  font-size: var(--font-size-lg);
+}
+
+.field--step .field__input {
+  height: 49px;
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-input);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+}
+
+.field--step .field__input:focus {
+  border-color: var(--color-text);
+}
+
+.field--step .field__input--error {
+  border-color: var(--color-danger);
+}
+
+.field--step .field__hint,
+.field--step .field__error {
+  font-size: var(--font-size-xs);
+}
+
+.field--step .field__hint {
+  color: var(--color-text);
 }

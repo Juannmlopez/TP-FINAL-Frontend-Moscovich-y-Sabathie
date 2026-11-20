@@ -12,7 +12,8 @@ export async function updateProfile(data) {
   return response.data;
 }
 
-// { theme, language, showExplicit, profilePublic, yearlyGoal, genreIds }
+// { theme?: 'dark' | 'light', language?: 'es', genres?: string[] } (al menos uno; genres reemplaza la lista)
+// → { user, preferences: { theme, language, genres } }
 export async function updatePreferences(data) {
   const response = await api.put('/users/me/preferences', data);
   return response.data;

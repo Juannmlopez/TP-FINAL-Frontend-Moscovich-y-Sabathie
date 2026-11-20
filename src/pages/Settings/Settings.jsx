@@ -1,5 +1,5 @@
 // Configuración: editar datos del perfil (nombre, bio, avatar) y preferencias
-// (tema, idioma, contenido explícito, perfil público, objetivo anual, géneros).
+// (tema, idioma y géneros preferidos).
 //
 // Servicios que va a usar:
 //   - services/users.service.js: getProfile, updateProfile, updatePreferences
@@ -41,7 +41,7 @@ export default function Settings() {
     <section className="settings">
       <h1 className="page__title">Configuración</h1>
       {/* TODO: Formulario de perfil: displayName, bio, avatarUrl (usersService.updateProfile) */}
-      {/* TODO: Formulario de preferencias: theme, language, showExplicit, profilePublic, yearlyGoal y */}
+      {/* TODO: Formulario de preferencias: theme, language y */}
       {/*   géneros preferidos (usersService.updatePreferences) */}
       {/* TODO: Mostrar mensaje de éxito / ErrorMessage al guardar */}
     </section>

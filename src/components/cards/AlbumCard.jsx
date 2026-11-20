@@ -1,16 +1,21 @@
-// Tarjeta de álbum: portada, título, artista y año. Lleva a /album/:id.
+// Tarjeta de álbum: portada, título, artista y año. Lleva a /album/:externalId (id de Deezer).
 // Se usa en Home, Search, Library y Artist (discografía).
-// Props: album ({ id, title, artistName, coverUrl, releaseDate }), actions
+// Props: album (Content del backend: { externalId, title, artistName, coverUrl, releaseDate }),
+//        size ('md' | 'lg'), actions (botones extra)
 import { Link } from 'react-router-dom';
+import Cover from './Cover';
 
-export default function AlbumCard({ album, actions }) {
+export default function AlbumCard({ album, size = 'md', actions }) {
   if (!album) return null;
+  const anio = album.releaseDate ? album.releaseDate.slice(0, 4) : '';
 
   return (
-    <article className="card card--album">
-      {/* TODO: portada (album.coverUrl) */}
-      <Link to={`/album/${album.id}`}>{album.title}</Link>
-      {/* TODO: artista y año de lanzamiento (album.releaseDate) */}
+    <article className={`card card--${size}`}>
+      <Link to={`/album/${album.externalId}`} className="card__link">
+        <Cover src={album.coverUrl} alt={`Portada de ${album.title}`} />
+        <h3 className="card__title">{album.title}</h3>
+        <p className="card__subtitle">{[album.artistName, anio].filter(Boolean).join(' · ')}</p>
+      </Link>
       {actions}
     </article>
   );

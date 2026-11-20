@@ -58,7 +58,10 @@ export function AuthProvider({ children }) {
       // Aunque falle la red, del lado del cliente cerramos la sesión igual
       setAuthMessage('');
       setUser(null);
-      navigate('/login', { replace: true });
+      navigate('/login', {
+        replace: true,
+        state: { message: 'Cerraste sesión. ¡Hasta la próxima!', noticeType: 'success' },
+      });
     }
   }, [navigate]);
 
