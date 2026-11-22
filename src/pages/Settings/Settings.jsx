@@ -1,10 +1,10 @@
 // Configuración: perfil (nombre, bio, avatar), preferencias (tema, idioma, géneros) y
 // ajustes de reproducción, notificaciones y privacidad.
-// Perfil y preferencias se guardan en el backend; el resto, por ahora, en este dispositivo.
+// Todo se guarda en el backend: perfil (/users/me) y preferencias + ajustes (/users/me/preferences).
 import { useState } from 'react';
 import * as usersService from '../../services/users.service';
 import { useAuth } from '../../hooks/useAuth';
-import { loadSettings, saveSettings } from '../../utils/localSettings';
+import { settingsFrom } from '../../utils/localSettings';
 import Spinner from '../../components/ui/Spinner';
 import ErrorMessage from '../../components/ui/ErrorMessage';
 import Button from '../../components/ui/Button';
@@ -66,9 +66,8 @@ function PerfilForm({ user, onSaved }) {
     setGuardando(true);
     setEstado({ ok: '', error: '' });
     try {
-      // El backend ignora los campos vacíos, así que solo se mandan los que tienen valor
-      const body = { displayName: nombre };
-      if (form.bio.trim()) body.bio = form.bio.trim();
+      // La bio puede quedar vacía; el avatar solo se manda si hay una URL (el backend no acepta vacío)
+      const body = { displayName: nombre, bio: form.bio.trim() };
       if (form.avatarUrl.trim()) body.avatarUrl = form.avatarUrl.trim();
       const actualizado = await usersService.updateProfile(body);
       onSaved(actualizado.user || actualizado);
@@ -209,33 +208,45 @@ function PreferenciasForm({ preferences, onSaved }) {
 }
 
 // Sección de ajustes locales: reproducción, notificaciones o privacidad
-function AjustesLocales({ userId, grupo, titulo, children, campos }) {
-  const [valores, setValores] = useState(() => loadSettings(userId, grupo));
-  const [ok, setOk] = useState('');
+function AjustesGrupo({ preferences, onSaved, grupo, titulo, campos }) {
+  const [valores, setValores] = useState(() => settingsFrom(preferences, grupo));
+  const [estado, setEstado] = useState({ ok: '', error: '' });
+  const [guardando, setGuardando] = useState(false);
 
   function cambiar(clave, valor) {
     setValores((prev) => ({ ...prev, [clave]: valor }));
-    setOk('');
+    setEstado({ ok: '', error: '' });
   }
 
-  function guardar() {
-    saveSettings(userId, grupo, valores);
-    setOk('Ajustes guardados');
+  async function guardar() {
+    setGuardando(true);
+    setEstado({ ok: '', error: '' });
+    try {
+      // El backend fusiona settings por grupo: se manda el grupo completo
+      const data = await usersService.updatePreferences({ settings: { [grupo]: valores } });
+      onSaved(data.preferences);
+      setEstado({ ok: 'Ajustes guardados', error: '' });
+    } catch (err) {
+      setEstado({ ok: '', error: err.message });
+    } finally {
+      setGuardando(false);
+    }
   }
 
   return (
     <div className="settings__section form-stack">
       <h2 className="home__heading">{titulo}</h2>
       {campos(valores, cambiar)}
-      {children}
-      <Resultado ok={ok} />
-      <Button onClick={guardar}>Guardar</Button>
+      <Resultado {...estado} />
+      <Button onClick={guardar} loading={guardando}>
+        Guardar
+      </Button>
     </div>
   );
 }
 
 export default function Settings() {
-  const { user, setUser, preferences, setPreferences } = useAuth();
+  const { setUser, preferences, setPreferences } = useAuth();
   const { data, loading, error, reload } = useFetch(() => usersService.getProfile(), []);
 
   if (loading) return <Spinner label="Cargando configuración..." />;
@@ -249,15 +260,18 @@ export default function Settings() {
     );
   }
 
+  const prefs = preferences || data.preferences;
+
   return (
     <section className="settings">
       <h1 className="page__title">Configuración</h1>
 
       <PerfilForm user={data.user} onSaved={setUser} />
-      <PreferenciasForm preferences={preferences || data.preferences} onSaved={setPreferences} />
+      <PreferenciasForm preferences={prefs} onSaved={setPreferences} />
 
-      <AjustesLocales
-        userId={user.id}
+      <AjustesGrupo
+        preferences={prefs}
+        onSaved={setPreferences}
         grupo="playback"
         titulo="Reproducción"
         campos={(v, set) => (
@@ -283,8 +297,9 @@ export default function Settings() {
         )}
       />
 
-      <AjustesLocales
-        userId={user.id}
+      <AjustesGrupo
+        preferences={prefs}
+        onSaved={setPreferences}
         grupo="notifications"
         titulo="Notificaciones"
         campos={(v, set) => (
@@ -296,8 +311,9 @@ export default function Settings() {
         )}
       />
 
-      <AjustesLocales
-        userId={user.id}
+      <AjustesGrupo
+        preferences={prefs}
+        onSaved={setPreferences}
         grupo="privacy"
         titulo="Privacidad"
         campos={(v, set) => (

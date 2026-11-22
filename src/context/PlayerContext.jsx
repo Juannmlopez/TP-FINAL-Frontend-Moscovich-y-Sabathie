@@ -4,7 +4,7 @@ import { createContext, useCallback, useEffect, useMemo, useRef, useState } from
 import * as musicService from '../services/music.service';
 import * as statsService from '../services/stats.service';
 import { useAuth } from '../hooks/useAuth';
-import { loadSettings } from '../utils/localSettings';
+import { settingsFrom } from '../utils/localSettings';
 
 // oxlint-disable-next-line react/only-export-components
 export const PlayerContext = createContext(null);
@@ -12,7 +12,7 @@ export const PlayerContext = createContext(null);
 const MIN_MS_HISTORIAL = 3000; // menos que esto no cuenta como reproducción
 
 export function PlayerProvider({ children }) {
-  const { user } = useAuth();
+  const { user, preferences } = useAuth();
   const userId = user?.id;
 
   const audioRef = useRef(null);
@@ -23,15 +23,15 @@ export function PlayerProvider({ children }) {
   const [error, setError] = useState('');
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolumeState] = useState(() => loadSettings(userId, 'playback').volume);
+  const [volume, setVolumeState] = useState(() => settingsFrom(preferences, 'playback').volume);
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState('off'); // off | all | one
 
   // Espejo en un ref para usar el estado dentro de los eventos del <audio> sin datos viejos
   const stateRef = useRef({});
   useEffect(() => {
-    stateRef.current = { queue, index, shuffle, repeat, userId };
-  }, [queue, index, shuffle, repeat, userId]);
+    stateRef.current = { queue, index, shuffle, repeat, userId, autoplay: settingsFrom(preferences, 'playback').autoplay };
+  }, [queue, index, shuffle, repeat, userId, preferences]);
   const pasadoRef = useRef([]); // índices ya reproducidos (para "anterior" en aleatorio)
   const registroRef = useRef({ id: null, enviado: false });
   const reintentoRef = useRef(false);
@@ -186,8 +186,8 @@ export function PlayerProvider({ children }) {
     const onWaiting = () => setBuffering(true);
     const onEnded = () => {
       registrar();
-      const { userId: uid, repeat: modo } = stateRef.current;
-      if (modo !== 'one' && loadSettings(uid, 'playback').autoplay === false) {
+      const { autoplay, repeat: modo } = stateRef.current;
+      if (modo !== 'one' && autoplay === false) {
         setPlaying(false);
         setCurrentTime(0);
         return;
@@ -237,10 +237,11 @@ export function PlayerProvider({ children }) {
     if (audioRef.current) audioRef.current.volume = volume;
   }, [volume]);
 
-  // Al entrar, se usa el volumen inicial guardado en Configuración
+  // Cuando llegan las preferencias del usuario, se usa su volumen inicial de Configuración
+  const volumenInicial = settingsFrom(preferences, 'playback').volume;
   useEffect(() => {
-    if (userId) setVolumeState(loadSettings(userId, 'playback').volume);
-  }, [userId]);
+    if (userId) setVolumeState(volumenInicial);
+  }, [userId, volumenInicial]);
 
   // Al cerrar sesión se corta todo
   useEffect(() => {

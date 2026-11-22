@@ -1,24 +1,12 @@
-// Ajustes que el backend todavía no guarda (reproducción, notificaciones, privacidad).
-// Se guardan en el navegador, separados por usuario.
-const DEFAULTS = {
+// Ajustes de reproducción, notificaciones y privacidad. Se guardan en el backend dentro de
+// preferences.settings = { playback, notifications, privacy }; acá están los valores por defecto.
+export const DEFAULT_SETTINGS = {
   playback: { autoplay: true, volume: 0.8 },
   notifications: { newReleases: true, weeklySummary: false, recommendations: true },
   privacy: { publicProfile: true, showActivity: true, showStats: false },
 };
 
-function clave(userId, grupo) {
-  return `settings:${userId || 'anon'}:${grupo}`;
-}
-
-export function loadSettings(userId, grupo) {
-  try {
-    const guardado = JSON.parse(localStorage.getItem(clave(userId, grupo)));
-    return { ...DEFAULTS[grupo], ...(guardado || {}) };
-  } catch {
-    return { ...DEFAULTS[grupo] };
-  }
-}
-
-export function saveSettings(userId, grupo, valores) {
-  localStorage.setItem(clave(userId, grupo), JSON.stringify(valores));
+// Devuelve el grupo pedido con los valores por defecto completados
+export function settingsFrom(preferences, grupo) {
+  return { ...DEFAULT_SETTINGS[grupo], ...(preferences?.settings?.[grupo] || {}) };
 }
