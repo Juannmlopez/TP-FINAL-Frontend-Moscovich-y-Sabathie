@@ -2,6 +2,7 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as authService from '../services/auth.service';
+import * as usersService from '../services/users.service';
 
 // Se exporta para que hooks/useAuth.js lo pueda leer
 // oxlint-disable-next-line react/only-export-components
@@ -12,6 +13,8 @@ const MENSAJE_VENCIDA = 'Tu sesión venció, volvé a iniciar sesión';
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Preferencias del perfil: { theme, language, genres }
+  const [preferences, setPreferences] = useState(null);
   // Aviso para mostrar en el login (lo pasa ProtectedRoute al redirigir)
   const [authMessage, setAuthMessage] = useState('');
   const navigate = useNavigate();
@@ -24,6 +27,28 @@ export function AuthProvider({ children }) {
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
+
+  // Al haber usuario, trae sus preferencias y aplica el tema (oscuro o claro)
+  const userId = user?.id;
+  useEffect(() => {
+    if (!userId) {
+      setPreferences(null);
+      document.documentElement.dataset.theme = 'dark';
+      return undefined;
+    }
+    let cancelado = false;
+    usersService
+      .getProfile()
+      .then((data) => !cancelado && setPreferences(data.preferences))
+      .catch(() => {});
+    return () => {
+      cancelado = true;
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = preferences?.theme || 'dark';
+  }, [preferences]);
 
   // api.js dispara "auth:expired" cuando una ruta privada responde 401.
   // Al quedar user en null, ProtectedRoute manda a /login con el aviso.
@@ -66,8 +91,8 @@ export function AuthProvider({ children }) {
   }, [navigate]);
 
   const value = useMemo(
-    () => ({ user, loading, authMessage, login, register, logout }),
-    [user, loading, authMessage, login, register, logout]
+    () => ({ user, loading, authMessage, preferences, setUser, setPreferences, login, register, logout }),
+    [user, loading, authMessage, preferences, login, register, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

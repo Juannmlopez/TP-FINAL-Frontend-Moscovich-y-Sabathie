@@ -26,3 +26,9 @@ export function formatMinutes(min) {
   if (minutos === 0) return `${horas} h`;
   return `${horas} h ${minutos} min`;
 }
+
+// Segundos (con decimales) → "0:27"
+export function formatTime(segundos) {
+  const total = Math.max(0, Math.floor(Number(segundos) || 0));
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+}

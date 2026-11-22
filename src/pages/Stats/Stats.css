@@ -1,7 +1,79 @@
-/* Estilos de la página Estadísticas */
-/* TODO: estilos según el Figma */
+/* Estadísticas */
 .stats {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+}
+
+.stats__year {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stats__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.stats__rankings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Resumen tipo Wrapped */
+.wrapped {
+  padding: var(--space-5);
+  color: #2d2154;
+  background: linear-gradient(135deg, #cdf564, #f0a1c4);
+  border-radius: var(--radius-lg);
+}
+
+.wrapped .home__eyebrow {
+  color: #2d2154;
+}
+
+.wrapped__title {
+  font-size: var(--font-size-lg);
+}
+
+.wrapped__big {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+}
+
+.wrapped__facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bars__item {
+  display: grid;
+  grid-template-columns: 90px 1fr 40px;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.bars__track {
+  height: 10px;
+  overflow: hidden;
+  background-color: var(--color-surface-2);
+  border-radius: var(--radius-full);
+}
+
+.bars__fill {
+  display: block;
+  height: 100%;
+  background-color: var(--color-primary);
 }

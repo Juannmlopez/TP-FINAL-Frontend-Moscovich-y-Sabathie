@@ -95,6 +95,9 @@ export default function Login() {
           onChange={handleChange}
           error={errores.password}
         />
+        <Link to="/forgot-password" className="auth__forgot">
+          ¿Olvidaste tu contraseña?
+        </Link>
         <Button type="submit" variant="light" className="auth__next btn--lg" loading={enviando}>
           Iniciar sesión
         </Button>

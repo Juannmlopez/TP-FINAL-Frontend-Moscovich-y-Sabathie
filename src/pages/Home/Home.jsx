@@ -2,16 +2,21 @@
 //
 // Servicios:
 //   - services/music.service.js: getFeatured → { tracks, albums } (chart de Deezer)
-//   - services/stats.service.js: getActivity → { activities } (para "Escuchado recientemente")
+//   - services/stats.service.js: getActivity → { activities } (para "Escuchado recientemente" y "Actividad reciente")
+//   - services/collections.service.js: getCollections → { collections } (sección "Tus playlists")
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as musicService from '../../services/music.service';
 import * as statsService from '../../services/stats.service';
+import * as collectionsService from '../../services/collections.service';
 import Spinner from '../../components/ui/Spinner';
 import ErrorMessage from '../../components/ui/ErrorMessage';
 import AlbumCard from '../../components/cards/AlbumCard';
 import TrackCard from '../../components/cards/TrackCard';
 import Cover from '../../components/cards/Cover';
+import ArtistCard from '../../components/cards/ArtistCard';
+import CollectionCard from '../../components/cards/CollectionCard';
+import ActivityList from '../../components/activity/ActivityList';
 import './Home.css';
 
 const MAX_RECIENTES = 10;
@@ -31,14 +36,15 @@ function contenidosRecientes(activities = []) {
   return recientes;
 }
 
-// Pide destacados y actividad en paralelo. La actividad es secundaria: si falla,
-// la Home se muestra igual sin "Escuchado recientemente".
+// Pide destacados, actividad y playlists en paralelo. Actividad y playlists son secundarias:
+// si fallan, la Home se muestra igual sin esas secciones.
 async function pedirDatos() {
-  const [featured, actividad] = await Promise.allSettled([
+  const [featured, actividad, playlists] = await Promise.allSettled([
     musicService.getFeatured(),
     statsService.getActivity(),
+    collectionsService.getCollections(),
   ]);
-  return { featured, actividad };
+  return { featured, actividad, playlists };
 }
 
 // Fila con scroll horizontal y título de sección
@@ -81,17 +87,26 @@ function Reciente({ contenido }) {
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [destacados, setDestacados] = useState({ tracks: [], albums: [] });
+  const [destacados, setDestacados] = useState({ tracks: [], albums: [], artists: [] });
   const [recientes, setRecientes] = useState([]);
+  const [actividades, setActividades] = useState([]);
+  const [playlists, setPlaylists] = useState([]);
 
   // Aplica al estado lo que devolvió pedirDatos()
-  const aplicar = useCallback(({ featured, actividad }) => {
+  const aplicar = useCallback(({ featured, actividad, playlists: pl }) => {
     if (featured.status === 'fulfilled') {
-      setDestacados({ tracks: featured.value.tracks || [], albums: featured.value.albums || [] });
+      setDestacados({
+        tracks: featured.value.tracks || [],
+        albums: featured.value.albums || [],
+        artists: featured.value.artists || [],
+      });
     } else {
       setError(featured.reason.message);
     }
-    setRecientes(actividad.status === 'fulfilled' ? contenidosRecientes(actividad.value.activities) : []);
+    const acts = actividad.status === 'fulfilled' ? actividad.value.activities : [];
+    setActividades(acts);
+    setRecientes(contenidosRecientes(acts));
+    setPlaylists(pl.status === 'fulfilled' ? pl.value.collections : []);
     setLoading(false);
   }, []);
 
@@ -164,18 +179,54 @@ export default function Home() {
         </section>
       ) : (
         <>
-          <Fila titulo="Destacados">
-            {destacados.albums.map((album) => (
-              <AlbumCard key={album.id} album={album} size="lg" />
-            ))}
-          </Fila>
-          <Fila titulo="Canciones del momento">
+          <Fila titulo="Canciones recomendadas">
             {destacados.tracks.map((track) => (
               <TrackCard key={track.id} track={track} />
             ))}
           </Fila>
+          <Fila titulo="Álbumes">
+            {destacados.albums.map((album) => (
+              <AlbumCard key={album.id} album={album} size="lg" />
+            ))}
+          </Fila>
+          {destacados.artists.length > 0 && (
+            <section className="home__section">
+              <div className="home__section-header">
+                <h2 className="home__heading">Artistas populares</h2>
+                <Link to="/artists">Ver todos</Link>
+              </div>
+              <div className="home__row">
+                {destacados.artists.map((artist) => (
+                  <ArtistCard key={artist.id} artist={artist} />
+                ))}
+              </div>
+            </section>
+          )}
         </>
       )}
+
+      <section className="home__section">
+        <div className="home__section-header">
+          <h2 className="home__heading">Tus playlists</h2>
+          <Link to="/collections">Ver todas</Link>
+        </div>
+        {playlists.length === 0 ? (
+          <p className="field__hint">
+            Todavía no tenés playlists. <Link to="/collections">Creá la primera</Link>
+          </p>
+        ) : (
+          <div className="home__row">
+            {playlists.map((collection) => (
+              <CollectionCard key={collection.id} collection={collection} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="home__section">
+        <h2 className="home__heading">Actividad reciente</h2>
+        <ActivityList activities={actividades} limit={5} />
+      </section>
     </div>
   );
 }

@@ -1,0 +1,41 @@
+/* Pantalla de reproducción: portada grande y controles centrados */
+.now-playing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.now-playing__cover {
+  width: min(320px, 80vw);
+}
+
+.now-playing__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 100%;
+}
+
+.now-playing__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.now-playing__artist {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-muted);
+}
+
+.now-playing__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}

@@ -24,3 +24,9 @@ export async function me() {
   const response = await api.get('/auth/me');
   return response.data;
 }
+
+// Recuperación de contraseña: { email }. El backend manda un mail con el enlace de recuperación.
+export async function forgotPassword(email) {
+  const response = await api.post('/auth/forgot-password', { email });
+  return response.data;
+}

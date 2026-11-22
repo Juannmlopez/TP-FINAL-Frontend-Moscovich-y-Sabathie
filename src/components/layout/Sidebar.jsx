@@ -4,7 +4,9 @@ import { NavLink } from 'react-router-dom';
 const LINKS = [
   { to: '/', label: 'Inicio', end: true },
   { to: '/search', label: 'Buscar' },
+  { to: '/artists', label: 'Artistas' },
   { to: '/library', label: 'Biblioteca' },
+  { to: '/queue', label: 'Cola de reproducción' },
   { to: '/collections', label: 'Playlists' },
   { to: '/stats', label: 'Estadísticas' },
   { to: '/profile', label: 'Perfil' },

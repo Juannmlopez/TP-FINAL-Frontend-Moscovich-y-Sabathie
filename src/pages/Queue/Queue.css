@@ -1,0 +1,22 @@
+/* Cola de reproducción */
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.queue__item {
+  cursor: grab;
+}
+
+.queue__item--current {
+  background-color: var(--color-surface);
+}
+
+.queue__item--over {
+  outline: 2px dashed var(--color-primary);
+}
+
+.queue__grip {
+  color: var(--color-text-muted);
+}

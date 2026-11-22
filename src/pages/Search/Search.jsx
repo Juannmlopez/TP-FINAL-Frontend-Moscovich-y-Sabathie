@@ -3,9 +3,11 @@
 //
 // El texto y el tipo viven en la URL (?q=&type=), así el botón "atrás" y recargar mantienen la búsqueda.
 // Servicio: services/music.service.js → search({ q, type }) → { results: Content[] }
+// Las playlists no vienen de Deezer: se buscan por nombre entre las del usuario (collections.service.js).
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import * as musicService from '../../services/music.service';
+import * as collectionsService from '../../services/collections.service';
 import Spinner from '../../components/ui/Spinner';
 import ErrorMessage from '../../components/ui/ErrorMessage';
 import EmptyState from '../../components/ui/EmptyState';
@@ -15,8 +17,36 @@ import './Search.css';
 const TIPOS = [
   { value: 'track', label: 'Canciones' },
   { value: 'album', label: 'Álbumes' },
+  { value: 'artist', label: 'Artistas' },
+  { value: 'playlist', label: 'Playlists' },
 ];
-const ETIQUETA_TIPO = { track: 'Canción', album: 'Álbum' };
+const ETIQUETA_TIPO = { track: 'Canción', album: 'Álbum', artist: 'Artista', playlist: 'Playlist' };
+const ORDENES = {
+  relevancia: { label: 'Relevancia', fn: null },
+  titulo: { label: 'Título (A-Z)', fn: (a, b) => a.title.localeCompare(b.title, 'es') },
+  artista: { label: 'Artista (A-Z)', fn: (a, b) => (a.artistName || '').localeCompare(b.artistName || '', 'es') },
+};
+
+// Ruta del detalle de un resultado
+function rutaDe(contenido) {
+  return contenido.type === 'playlist' ? `/collections/${contenido.id}` : `/${contenido.type}/${contenido.externalId}`;
+}
+
+// Busca según el tipo: Deezer para canciones, álbumes y artistas; las playlists del usuario por nombre
+async function buscar(q, type) {
+  if (type !== 'playlist') return (await musicService.search({ q, type })).results || [];
+  const { collections } = await collectionsService.getCollections();
+  const texto = q.toLowerCase();
+  return collections
+    .filter((c) => c.name.toLowerCase().includes(texto))
+    .map((c) => ({
+      id: `playlist-${c.id}`,
+      ...c,
+      type: 'playlist',
+      title: c.name,
+      artistName: `${c.itemCount} ${c.itemCount === 1 ? 'canción' : 'canciones'}`,
+    }));
+}
 const ESPERA_MS = 400; // espera después de la última tecla antes de buscar
 const MAX_TEXTO = 100; // límite del backend
 const CLAVE_RECIENTES = 'busquedasRecientes';
@@ -40,7 +70,7 @@ function FilaResultado({ contenido, onAbrir, onQuitar }) {
   return (
     <li className="search__item">
       <Link
-        to={`/${contenido.type}/${contenido.externalId}`}
+        to={rutaDe(contenido)}
         className="search__link"
         onClick={() => onAbrir?.(contenido)}
       >
@@ -76,7 +106,9 @@ function FilaResultado({ contenido, onAbrir, onQuitar }) {
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const q = (searchParams.get('q') || '').trim();
-  const type = searchParams.get('type') === 'album' ? 'album' : 'track';
+  const typeParam = searchParams.get('type');
+  const type = TIPOS.some((t) => t.value === typeParam) ? typeParam : 'track';
+  const [orden, setOrden] = useState('relevancia');
   const clave = `${type}:${q}`; // identifica la búsqueda actual
 
   const [texto, setTexto] = useState(searchParams.get('q') || '');
@@ -110,10 +142,9 @@ export default function Search() {
   useEffect(() => {
     if (!q) return;
     let cancelado = false;
-    musicService
-      .search({ q, type })
-      .then((data) => {
-        if (!cancelado) setResultado({ clave, items: data.results || [], error: '' });
+    buscar(q, type)
+      .then((items) => {
+        if (!cancelado) setResultado({ clave, items, error: '' });
       })
       .catch((error) => {
         if (!cancelado) setResultado({ clave, items: [], error: error.message });
@@ -173,6 +204,9 @@ export default function Search() {
     guardarRecientes([]);
   }
 
+  const ordenFn = ORDENES[orden].fn;
+  const itemsOrdenados = ordenFn ? [...resultado.items].sort(ordenFn) : resultado.items;
+
   let contenido;
   if (!q) {
     contenido =
@@ -191,7 +225,7 @@ export default function Search() {
           </ul>
         </section>
       ) : (
-        <EmptyState title="Buscá tu música" message="Encontrá canciones y álbumes por nombre o artista." />
+        <EmptyState title="Buscá tu música" message="Encontrá canciones, álbumes, artistas y playlists." />
       );
   } else if (cargando) {
     contenido = <Spinner label="Buscando..." />;
@@ -202,7 +236,7 @@ export default function Search() {
   } else {
     contenido = (
       <ul className="search__list">
-        {resultado.items.map((item) => (
+        {itemsOrdenados.map((item) => (
           <FilaResultado key={item.id} contenido={item} onAbrir={agregarReciente} />
         ))}
       </ul>
@@ -218,7 +252,7 @@ export default function Search() {
           <span className="search__icon" aria-hidden="true">
             ⌕
           </span>
-          <span className="sr-only">Buscar canciones o álbumes</span>
+          <span className="sr-only">Buscar canciones, álbumes, artistas o playlists</span>
           <input
             type="search"
             className="search__input"
@@ -249,6 +283,20 @@ export default function Search() {
             {tipo.label}
           </button>
         ))}
+        {q && type !== 'playlist' && type !== 'artist' && (
+          <select
+            className="status-select search__sort"
+            value={orden}
+            onChange={(event) => setOrden(event.target.value)}
+            aria-label="Ordenar resultados"
+          >
+            {Object.entries(ORDENES).map(([clave, o]) => (
+              <option key={clave} value={clave}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {contenido}

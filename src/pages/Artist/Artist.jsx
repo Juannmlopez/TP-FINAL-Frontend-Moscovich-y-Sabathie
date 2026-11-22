@@ -1,39 +1,37 @@
-// Detalle de un artista: imagen, nombre, descripción, géneros y metadatos,
-// más su discografía. Acciones: guardar en biblioteca, cambiar estado, favorito,
-// puntuar y reseñar.
-//
-// Servicios que va a usar:
-//   - services/music.service.js: getArtist, getArtistAlbums
-//   - services/library.service.js: addItem, updateItem, setRating
-//   - services/reviews.service.js: saveReview
-import { useState } from 'react';
+// Detalle de un artista: foto, nombre, fans y discografía.
+// Acciones: guardar en la biblioteca, estado, favorito, puntuar y reseñar.
 import { useParams } from 'react-router-dom';
+import * as musicService from '../../services/music.service';
+import { useFetch } from '../../hooks/useFetch';
 import Spinner from '../../components/ui/Spinner';
 import ErrorMessage from '../../components/ui/ErrorMessage';
 import EmptyState from '../../components/ui/EmptyState';
+import Cover from '../../components/cards/Cover';
+import AlbumCard from '../../components/cards/AlbumCard';
+import ContentActions from '../../components/library/ContentActions';
 import './Artist.css';
 
 export default function Artist() {
   const { id } = useParams();
-  // Estados de la pantalla (los setters se agregan al implementar la carga)
-  const [loading] = useState(false);
-  const [error] = useState('');
-  const [data] = useState(null);
+  const { data, loading, error, reload } = useFetch(
+    () => Promise.all([musicService.getArtist(id), musicService.getArtistAlbums(id).catch(() => ({ albums: [] }))]),
+    [id]
+  );
 
-  // TODO: useEffect que cargue los datos cuando cambia el id, manejando loading y error
-
-  if (loading) return <Spinner label="Cargando..." />;
+  if (loading) return <Spinner label="Cargando artista..." />;
 
   if (error) {
     return (
       <section className="artist">
         <h1 className="page__title">Artista</h1>
-        <ErrorMessage message={error} />
+        <ErrorMessage message={error} onRetry={reload} />
       </section>
     );
   }
 
-  if (!data) {
+  const artist = data?.[0]?.artist;
+  const albums = data?.[1]?.albums || [];
+  if (!artist) {
     return (
       <section className="artist">
         <h1 className="page__title">Artista</h1>
@@ -44,11 +42,36 @@ export default function Artist() {
 
   return (
     <section className="artist">
-      <h1 className="page__title">Artista</h1>
-      <p className="artist__id">ID: {id}</p>
-      {/* TODO: Cabecera: imagen, nombre, géneros y metadatos (musicService.getArtist(id)) */}
-      {/* TODO: Discografía: AlbumCard por cada álbum (musicService.getArtistAlbums(id)) */}
-      {/* TODO: Acciones: StatusSelect, FavoriteButton, RatingStars y ReviewForm */}
+      <header className="detail-header">
+        <div className="detail-header__cover detail-header__cover--round">
+          <Cover src={artist.coverUrl} alt={`Foto de ${artist.title}`} round />
+        </div>
+        <div className="detail-header__info">
+          <p className="home__eyebrow">ARTISTA</p>
+          <h1 className="detail-header__title">{artist.title}</h1>
+          <p className="field__hint">
+            {[
+              artist.fans != null && `${artist.fans.toLocaleString('es-AR')} fans`,
+              artist.albumsCount != null && `${artist.albumsCount} álbumes`,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
+        </div>
+      </header>
+
+      <ContentActions content={artist} />
+
+      <h2 className="home__heading">Discografía</h2>
+      {albums.length === 0 ? (
+        <EmptyState title="Sin álbumes para mostrar" />
+      ) : (
+        <div className="card-grid">
+          {albums.map((album) => (
+            <AlbumCard key={album.id} album={album} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

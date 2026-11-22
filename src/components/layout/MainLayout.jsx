@@ -1,8 +1,9 @@
-// Estructura de las páginas privadas: sidebar + navbar + contenido de la ruta
+// Estructura de las páginas privadas: sidebar + navbar + contenido de la ruta + reproductor
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+import PlayerBar from '../player/PlayerBar';
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function MainLayout() {
           <Outlet />
         </main>
       </div>
+      <PlayerBar />
     </div>
   );
 }

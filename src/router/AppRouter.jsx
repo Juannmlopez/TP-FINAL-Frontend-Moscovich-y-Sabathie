@@ -6,11 +6,15 @@ import MainLayout from '../components/layout/MainLayout';
 import Welcome from '../pages/Welcome/Welcome';
 import Login from '../pages/Login/Login';
 import Register from '../pages/Register/Register';
+import ForgotPassword from '../pages/ForgotPassword/ForgotPassword';
 import Home from '../pages/Home/Home';
 import Search from '../pages/Search/Search';
+import Artists from '../pages/Artists/Artists';
 import Artist from '../pages/Artist/Artist';
 import Album from '../pages/Album/Album';
 import Track from '../pages/Track/Track';
+import Queue from '../pages/Queue/Queue';
+import NowPlaying from '../pages/NowPlaying/NowPlaying';
 import Library from '../pages/Library/Library';
 import Collections from '../pages/Collections/Collections';
 import CollectionDetail from '../pages/CollectionDetail/CollectionDetail';
@@ -27,6 +31,7 @@ export default function AppRouter() {
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Route>
 
       {/* Privadas: requieren sesión y usan el layout con sidebar y navbar */}
@@ -34,10 +39,14 @@ export default function AppRouter() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/artists" element={<Artists />} />
           <Route path="/artist/:id" element={<Artist />} />
           <Route path="/album/:id" element={<Album />} />
           <Route path="/track/:id" element={<Track />} />
           <Route path="/library" element={<Library />} />
+          <Route path="/library/:categoria" element={<Library />} />
+          <Route path="/queue" element={<Queue />} />
+          <Route path="/now-playing" element={<NowPlaying />} />
           <Route path="/collections" element={<Collections />} />
           <Route path="/collections/:id" element={<CollectionDetail />} />
           <Route path="/profile" element={<Profile />} />
